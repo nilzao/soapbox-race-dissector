@@ -8,21 +8,23 @@ dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-packet-types.lua")
 
 p_soapbox = Proto ("SOAPBOX","Soapbox-race ")
 
-f_data = ProtoField.string("soapbox.data", "Data", FT_STRING)
 f_sb_pkt_orig_type = ProtoField.uint16("soapbox.pktorig", "Pkg Orig", base.BOOLEAN)
 f_sb_count = ProtoField.uint16("soapbox.count", "Counter", base.HEX)
 f_sb_time = ProtoField.uint16("soapbox.time", "Time", base.DEC)
 f_sb_crc = ProtoField.uint16("soapbox.crc", "CRC", base.HEX)
 f_sb_player = ProtoField.uint16("soapbox.player", "Player", base.DEC)
 f_sb_session_id = ProtoField.uint16("soapbox.sessionid", "Session Id", base.DEC)
+f_persona_name = ProtoField.string("soapbox.personaid", "Persona Name", base.UNIT_STRING)
+f_persona_id = ProtoField.uint16("soapbox.personaid", "Persona Id", base.HEX)
 f_sb_pkg_size = ProtoField.uint16("soapbox.pkgsize", "Pkg Size", base.DEC)
 p_soapbox.fields = {--
-  f_data, --
   f_sb_count, --
   f_sb_time, --
   f_sb_pkt_orig_type, --
   f_sb_session_id, --
   f_sb_player, --
+  f_persona_id, --
+  f_persona_name, --
   f_sb_pkg_size,
   f_sb_crc --
 }
