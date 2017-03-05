@@ -1,3 +1,10 @@
+function detectCliSrvType(buf)
+  if (bytes:subset(0,1) == ByteArray.new("01")) then
+    return "cli-to-cli"
+  end
+  return "srv"
+end
+
 function detectType(buf)
   bytes = buf(0):bytes()
   if ( bytes:len() == 18 or bytes:len() == 17) then
