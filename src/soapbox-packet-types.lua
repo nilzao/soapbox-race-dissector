@@ -5,7 +5,7 @@ function detectCliSrvType(buf)
   return "srv2p"
 end
 
-function detectCliCliType(pkt)
+function detectDirection(pkt)
   -- bug, when cli-to-cli-srv counter reach 0027 or 0073 mark a false srv-to-cli
   -- 0027 and 0073 are packet size, need to implement right detection
   -- local bytes = buf(0):bytes():subset(2,2)
