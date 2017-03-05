@@ -1,8 +1,8 @@
 function detectCliSrvType(buf)
   if (buf(0):bytes():subset(0,1) == ByteArray.new("01")) then
-    return "cli-to-cli"
+    return "p2p"
   end
-  return "srv"
+  return "srv2p"
 end
 
 function detectCliCliType(buf)
@@ -10,9 +10,9 @@ function detectCliCliType(buf)
   --  0027 and 0073 are packet size, need to implement right detection
   local bytes = buf(0):bytes():subset(2,2)
   if (bytes == ByteArray.new("0027") or bytes == ByteArray.new("0073")) then
-    return "cli-to-srv"
+    return "cli->srv"
   end
-  return "srv-to-cli"
+  return "srv->cli"
 end
 
 
@@ -82,7 +82,7 @@ function setCountField(buf, subtree, pos_ini)
 end
 
 function setCountFieldCliCli(buf, subtree, cli_cli_type)
-  if cli_cli_type == "srv-to-cli" then
+  if cli_cli_type == "p2p" then
     setCountField(buf, subtree, 2)
   else
     subtree:add(f_sb_pkg_size, buf(2,2))
