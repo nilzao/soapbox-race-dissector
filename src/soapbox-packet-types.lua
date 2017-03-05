@@ -1,12 +1,23 @@
 function detectCliSrvType(buf)
-  if (bytes:subset(0,1) == ByteArray.new("01")) then
+  if (buf(0):bytes():subset(0,1) == ByteArray.new("01")) then
     return "cli-to-cli"
   end
   return "srv"
 end
 
+function detectCliCliType(buf)
+  -- bug, when cli-to-cli-srv counter reach 0027 or 0073 mark a false srv-to-cli
+  --  0027 and 0073 are packet size, need to implement right detection
+  local bytes = buf(0):bytes():subset(2,2)
+  if (bytes == ByteArray.new("0027") or bytes == ByteArray.new("0073")) then
+    return "cli-to-srv"
+  end
+  return "srv-to-cli"
+end
+
+
 function detectType(buf)
-  bytes = buf(0):bytes()
+  local bytes = buf(0):bytes()
   if ( bytes:len() == 18 or bytes:len() == 17) then
     return "sync-keep-alive"
   elseif bytes:len() == 26 or bytes:len() == 25  then
@@ -63,4 +74,21 @@ function setFieldsFromType(buf, pkt, root)
   elseif (detectType(buf) == "sync") then
     setSyncFields(buf,pkt,root)
   end
+end
+
+
+function setCountField(buf, subtree, pos_ini)
+  subtree:add(f_sb_count, buf(pos_ini,2))
+end
+
+function setCountFieldCliCli(buf, subtree, cli_cli_type)
+  if cli_cli_type == "srv-to-cli" then
+    setCountField(buf, subtree, 2)
+  else
+    subtree:add(f_sb_pkg_size, buf(2,2))
+  end
+end
+
+function setPlayerField(buf, subtree)
+  subtree:add(f_sb_player, buf(1,1))
 end
