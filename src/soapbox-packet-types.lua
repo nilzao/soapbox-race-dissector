@@ -5,11 +5,14 @@ function detectCliSrvType(buf)
   return "srv2p"
 end
 
-function detectCliCliType(buf)
+function detectCliCliType(pkt)
   -- bug, when cli-to-cli-srv counter reach 0027 or 0073 mark a false srv-to-cli
-  --  0027 and 0073 are packet size, need to implement right detection
-  local bytes = buf(0):bytes():subset(2,2)
-  if (bytes == ByteArray.new("0027") or bytes == ByteArray.new("0073")) then
+  -- 0027 and 0073 are packet size, need to implement right detection
+  -- local bytes = buf(0):bytes():subset(2,2)
+  -- if (bytes == ByteArray.new("0027") or bytes == ByteArray.new("0073")) then
+
+  -- quickfix with static port 9998, not nice...
+  if pkt.dst_port == 9998 then
     return "cli->srv"
   end
   return "srv->cli"
@@ -87,6 +90,10 @@ function setCountFieldCliCli(buf, subtree, cli_cli_type)
   else
     subtree:add(f_sb_pkg_size, buf(2,2))
   end
+end
+
+function setTimeField(buf, subtree, pos_ini)
+  subtree:add(f_sb_time, buf(pos_ini,2))
 end
 
 function setPlayerField(buf, subtree)

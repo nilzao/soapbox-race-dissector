@@ -11,12 +11,14 @@ p_soapbox = Proto ("SOAPBOX","Soapbox-race ")
 f_data = ProtoField.string("soapbox.data", "Data", FT_STRING)
 f_sb_pkt_orig_type = ProtoField.uint16("soapbox.pktorig", "PkgOrig", base.BOOLEAN)
 f_sb_count = ProtoField.uint16("soapbox.f_sb_count", "Counter", base.HEX)
+f_sb_time = ProtoField.uint16("soapbox.f_sb_time", "Time", base.DEC)
 f_sb_crc = ProtoField.uint16("soapbox.f_sb_crc", "CRC", base.HEX)
 f_sb_player = ProtoField.uint16("soapbox.f_sb_player", "Player", base.DEC)
 f_sb_pkg_size = ProtoField.uint16("soapbox.f_sb_pkg_size", "Pkg Size", base.DEC)
 p_soapbox.fields = {--
   f_data, --
   f_sb_count, --
+  f_sb_time, --
   f_sb_pkt_orig_type, --
   f_sb_player, --
   f_sb_pkg_size,
