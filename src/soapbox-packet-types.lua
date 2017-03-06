@@ -18,6 +18,14 @@ function detectDirection(pkt)
   return "srv->cli"
 end
 
+function getIniP2PBytePos(buf, pkt)
+  local direction = detectDirection(pkt)
+  if direction == "srv->cli" then
+    return 0
+  else
+    return 2
+  end
+end
 
 function detectType(buf, pkt)
   local bytes = buf(0):bytes()
@@ -93,6 +101,12 @@ function setCountField(buf, pkt, subtree)
     else
       subtree:add(f_sb_count, buf(2,2))
     end
+  else
+    if cli_srv_type == "srv2p" then
+    --
+    else
+      subtree:add(f_sb_count, buf(4,2))
+    end
   end
 end
 
@@ -109,4 +123,37 @@ function setPacketSizeField(buf,pkt,subtree)
   if direction == "cli->srv" then
     subtree:add(f_sb_pkt_size, buf(2,2))
   end
+end
+
+function setStaticFFp2pField(buf,pkt,subtree)
+  local direction = detectDirection(pkt)
+  local byteStart = 6 + getIniP2PBytePos(buf,pkt)
+  subtree:add(f_sb_static_ff, buf(byteStart,2))
+end
+
+function setBeforeHandShakeField(buf, pkt, subtree)
+  local byteStart = 4 + getIniP2PBytePos(buf,pkt)
+  local direction = detectDirection(pkt)
+  local bytes = buf(0):bytes()
+  local staticFF = ByteArray.new("FFFF")
+  if bytes:subset(byteStart,2) == staticFF then
+    subtree:add(f_sb_before_handshake, buf(byteStart,2))
+  else
+    subtree:add(f_sb_unknown_seq, buf(byteStart,2))
+  end
+end
+
+function setUnknownP2PEnum(buf, pkt, subtree)
+  local byteStart = 8 + getIniP2PBytePos(buf,pkt)
+  subtree:add(f_sb_unknown_enum, buf(byteStart,1))
+end
+
+function setSubPacketSize(buf, pkt, subtree)
+  local byteStart = 9 + getIniP2PBytePos(buf,pkt)
+  subtree:add(f_sb_sub_pkt_size, buf(byteStart,1))
+end
+
+function setUnknownP2PSequence(buf, pkt, subtree, byteStart)
+  local byteStart = byteStart + getIniP2PBytePos(buf,pkt)
+  subtree:add(f_sb_unknown_seq, buf(byteStart,2))
 end
