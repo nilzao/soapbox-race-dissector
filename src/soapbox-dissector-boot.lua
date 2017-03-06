@@ -16,7 +16,7 @@ f_sb_player = ProtoField.uint16("soapbox.player", "Player", base.DEC)
 f_sb_session_id = ProtoField.uint16("soapbox.sessionid", "Session Id", base.DEC)
 f_persona_name = ProtoField.string("soapbox.personaid", "Persona Name", base.UNIT_STRING)
 f_persona_id = ProtoField.uint16("soapbox.personaid", "Persona Id", base.HEX)
-f_sb_pkt_size = ProtoField.uint16("soapbox.pkgsize", "Pkg Size", base.DEC)
+f_sb_pkt_size = ProtoField.uint16("soapbox.pktsize", "Pkt Size", base.DEC)
 p_soapbox.fields = {--
   f_sb_count, --
   f_sb_time, --
