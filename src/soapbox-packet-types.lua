@@ -103,3 +103,10 @@ end
 function setPlayerField(buf, subtree)
   subtree:add(f_sb_player, buf(1,1))
 end
+
+function setPacketSizeField(buf,pkt,subtree)
+  local direction = detectDirection(pkt)
+  if direction == "cli->srv" then
+    subtree:add(f_sb_pkt_size, buf(2,2))
+  end
+end
