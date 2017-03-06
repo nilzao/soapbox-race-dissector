@@ -19,7 +19,7 @@ function detectDirection(pkt)
 end
 
 
-function detectType(buf)
+function detectType(buf, pkt)
   local bytes = buf(0):bytes()
   if ( bytes:len() == 18 or bytes:len() == 17) then
     return "sync-keep-alive"
@@ -28,7 +28,12 @@ function detectType(buf)
   elseif bytes:len() == 22 or bytes:len() == 21 then
     return "sync"
   elseif (bytes:subset(0,1) == ByteArray.new("01") )then
-    if (bytes:subset(9,1) == ByteArray.new("02") or bytes:subset(10,1) == ByteArray.new("02")) then
+    local cli_cli_type = detectDirection(pkt)
+    local byteId = bytes:subset(10,1)
+    if cli_cli_type == "srv->cli" then
+      byteId = bytes:subset(8,1)
+    end
+    if (byteId == ByteArray.new("02")) then
       return "id"
     end
     return "pos"
@@ -48,47 +53,46 @@ function detectType(buf)
 end
 
 function getFieldsFromType(buf, pkt, root)
-  if (detectType(buf) == "hello") then
+  if (detectType(buf, pkt) == "hello") then
     return getHelloFields()
-  elseif (detectType(buf) == "id") then
+  elseif (detectType(buf, pkt) == "id") then
     return getIdFields()
-  elseif (detectType(buf) == "pos") then
+  elseif (detectType(buf, pkt) == "pos") then
     return getPosFields()
-  elseif (detectType(buf) == "sync-keep-alive") then
+  elseif (detectType(buf, pkt) == "sync-keep-alive") then
     return getSyncKeepAliveFields()
-  elseif (detectType(buf) == "sync-session") then
+  elseif (detectType(buf, pkt) == "sync-session") then
     return getSyncSessionFields()
-  elseif (detectType(buf) == "sync") then
+  elseif (detectType(buf, pkt) == "sync") then
     return getSyncFields()
   end
 end
 
 function setFieldsFromType(buf, pkt, root)
-  if(detectType(buf) == "hello") then
+  if(detectType(buf, pkt) == "hello") then
     setHelloFields(buf,pkt,root)
-  elseif (detectType(buf) == "id") then
+  elseif (detectType(buf, pkt) == "id") then
     setIdFields(buf,pkt,root)
-  elseif (detectType(buf) == "pos") then
+  elseif (detectType(buf, pkt) == "pos") then
     setPosFields(buf,pkt,root)
-  elseif (detectType(buf) == "sync-keep-alive") then
+  elseif (detectType(buf, pkt) == "sync-keep-alive") then
     setSyncKeepAliveFields(buf,pkt,root)
-  elseif (detectType(buf) == "sync-session") then
+  elseif (detectType(buf, pkt) == "sync-session") then
     setSyncSessionFields(buf,pkt,root)
-  elseif (detectType(buf) == "sync") then
+  elseif (detectType(buf, pkt) == "sync") then
     setSyncFields(buf,pkt,root)
   end
 end
 
-
-function setCountField(buf, subtree, pos_ini)
-  subtree:add(f_sb_count, buf(pos_ini,2))
-end
-
-function setCountFieldCliCli(buf, subtree, cli_cli_type)
-  if cli_cli_type == "p2p" then
-    setCountField(buf, subtree, 2)
-  else
-    subtree:add(f_sb_pkg_size, buf(2,2))
+function setCountField(buf, pkt, subtree)
+  local cli_srv_type = detectCliSrvType(buf)
+  local direction = detectDirection(pkt)
+  if direction == "srv->cli" then
+    if cli_srv_type == "srv2p" then
+      subtree:add(f_sb_count, buf(1,2))
+    else
+      subtree:add(f_sb_count, buf(2,2))
+    end
   end
 end
 
