@@ -2,7 +2,7 @@ function setSyncKeepAliveFields(buf, pkt, subtree)
   setCountField(buf,pkt,subtree)
   local cli_cli_type = detectDirection(pkt)
   if(cli_cli_type == 'srv->cli') then
-    setCountField(buf, subtree, 2)
+    setCountField(buf, pkt, subtree)
     setTimeField(buf,subtree,4)
   end
   pkt.cols.protocol = 'SB-SYNC-KA'
