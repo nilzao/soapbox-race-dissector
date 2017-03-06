@@ -1,6 +1,7 @@
 function setIdFields(buf, pkt, subtree)
   local cli_cli_type = detectDirection(pkt)
   setPlayerField(buf, subtree)
+  setCountField(buf,pkt,subtree)
   if(cli_cli_type == 'srv->cli') then
     subtree:add(f_persona_name, buf(11,32))
   else

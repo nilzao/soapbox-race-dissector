@@ -37,7 +37,6 @@ function p_soapbox.dissector (buf, pkt, root)
   pkt.cols.protocol = "SOAPBOX"
   local subtree = root:add(p_soapbox, buf(0))
   subtree:add(f_sb_pkt_orig_type, buf(0,1)):append_text(" ["..detectCliSrvType(buf).."]")
-  setCountField(buf,pkt,subtree)
   setFieldsFromType(buf, pkt, subtree)
   subtree:add(f_sb_crc, buf(buf:len()-4,4))
 end
