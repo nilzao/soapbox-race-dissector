@@ -27,6 +27,15 @@ function getIniP2PBytePos(buf, pkt)
   end
 end
 
+function getIniSrv2PBytePos(buf, pkt)
+  local direction = detectDirection(pkt)
+  if direction == "srv->cli" then
+    return 0
+  else
+    return 1
+  end
+end
+
 function detectType(buf, pkt)
   local bytes = buf(0):bytes()
   if ( bytes:len() == 18 or bytes:len() == 17) then
@@ -103,7 +112,7 @@ function setCountField(buf, pkt, subtree)
     end
   else
     if cli_srv_type == "srv2p" then
-    --
+      subtree:add(f_sb_count, buf(1,2))
     else
       subtree:add(f_sb_count, buf(4,2))
     end

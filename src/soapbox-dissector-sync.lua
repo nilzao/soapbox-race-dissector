@@ -1,9 +1,8 @@
 function setSyncFields(buf, pkt, subtree)
   setCountField(buf,pkt,subtree)
+  local bytePosIni =  4 + getIniSrv2PBytePos(buf,pkt)
+  setTimeField(buf,subtree,bytePosIni)
   local cli_cli_type = detectDirection(pkt)
-  if(cli_cli_type == 'srv->cli') then
-    setTimeField(buf,subtree,4)
-  end
   pkt.cols.protocol = 'SB-SYNC'
   pkt.cols.info = 'Sync Protocol ['..cli_cli_type..']'
 end
