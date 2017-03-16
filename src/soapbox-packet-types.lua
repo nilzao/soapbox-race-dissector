@@ -130,7 +130,15 @@ end
 function setPacketSizeField(buf,pkt,subtree)
   local direction = detectDirection(pkt)
   if direction == "cli->srv" then
-    subtree:add(f_sb_pkt_size, buf(2,2))
+    subtree:add(f_sb_pkt_size, buf(3,1))
+  end
+end
+
+function setPacketField(buf,pkt,subtree)
+  local direction = detectDirection(pkt)
+  if direction == "cli->srv" then
+    local packetSize = buf(3,1):int()
+    subtree:add(f_sb_pkt, buf(4,packetSize))
   end
 end
 
@@ -160,6 +168,12 @@ end
 function setSubPacketSize(buf, pkt, subtree)
   local byteStart = 9 + getIniP2PBytePos(buf,pkt)
   subtree:add(f_sb_sub_pkt_size, buf(byteStart,1))
+end
+
+function setSubPacket(buf, pkt, subtree)
+  local byteStart = 9 + getIniP2PBytePos(buf,pkt)
+  local pktSize = buf(byteStart,1):int()
+  subtree:add(f_sb_sub_pkt, buf(byteStart+1,pktSize))
 end
 
 function setUnknownP2PSequence(buf, pkt, subtree, byteStart)
