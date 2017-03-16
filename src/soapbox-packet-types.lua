@@ -150,6 +150,7 @@ end
 function setUnknownP2PEnum(start, buf, pkt, subtree)
   local byteStart = start + getIniP2PBytePos(buf,pkt)
   subtree:add(f_sb_unknown_enum, buf(byteStart,1))
+  return buf(byteStart,1):int()
 end
 
 function setSubPacketSize(start, buf, pkt, subtree)
