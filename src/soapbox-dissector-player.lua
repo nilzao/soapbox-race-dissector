@@ -1,9 +1,15 @@
 function setPlayerFields(buf, pkt, subtree)
   local cli_cli_type = detectDirection(pkt)
+  setPlayerField(buf, subtree)
   setPacketSizeField(buf,pkt,subtree)
   setCountField(buf,pkt,subtree)
   setBeforeHandShakeField(buf,pkt,subtree)
+  setStaticFFp2pField(buf,pkt,subtree)
   local unknownEnum = setUnknownP2PEnum(8, buf, pkt, subtree)
+  local debug = unknownEnum
+  if(unknownEnum == 2) then
+    setIdFields(buf,pkt,subtree)
+  end
   local packetSize = 0
   setSubPacketSize(9, buf, pkt, subtree)
   packetSize = setSubPacket(9, buf, pkt, subtree)
@@ -17,5 +23,5 @@ function setPlayerFields(buf, pkt, subtree)
   setPacketField(buf,pkt,subtree)
 
   pkt.cols.protocol = 'SB-PLAYER'
-  pkt.cols.info = 'Player Protocol ['..cli_cli_type..']'..packetSize
+  pkt.cols.info = 'Player Protocol ['..cli_cli_type..']'..debug
 end
