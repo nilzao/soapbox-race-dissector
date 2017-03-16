@@ -54,7 +54,10 @@ function p_soapbox.dissector (buf, pkt, root)
   local subtree = root:add(p_soapbox, buf(0))
   subtree:add(f_sb_pkt_orig_type, buf(0,1)):append_text(" ["..detectCliSrvType(buf).."]")
   setFieldsFromType(buf, pkt, subtree)
-  subtree:add(f_sb_crc, buf(buf:len()-4,4))
+  local cli_cli_type = detectDirection(pkt)
+  if(cli_cli_type == 'srv->cli') then
+    subtree:add(f_sb_crc, buf(buf:len()-4,4))
+  end
 end
 
 local udp_dissector_table = DissectorTable.get("udp.port")
