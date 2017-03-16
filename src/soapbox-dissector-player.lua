@@ -12,8 +12,7 @@ function setPlayerFields(buf, pkt, subtree)
   if(unknownEnum ~= -1) then
     packetSize = packetSize + 1
     setSubPacketSize(packetSize, buf, pkt, subtree)
-    packetSize = packetSize + 1
-    --packetSize = setSubPacket(packetSize, buf, pkt, subtree)
+    packetSize = setSubPacket(packetSize, buf, pkt, subtree)
   end
   setPacketField(buf,pkt,subtree)
 
