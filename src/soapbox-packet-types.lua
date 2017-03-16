@@ -45,15 +45,16 @@ function detectType(buf, pkt)
   elseif bytes:len() == 22 or bytes:len() == 21 then
     return "sync"
   elseif (bytes:subset(0,1) == ByteArray.new("01") )then
-    local cli_cli_type = detectDirection(pkt)
-    local byteId = bytes:subset(10,1)
-    if cli_cli_type == "srv->cli" then
-      byteId = bytes:subset(8,1)
-    end
-    if (byteId == ByteArray.new("02")) then
-      return "id"
-    end
-    return "pos"
+    return "player"
+      --local cli_cli_type = detectDirection(pkt)
+      --local byteId = bytes:subset(10,1)
+      --if cli_cli_type == "srv->cli" then
+      --  byteId = bytes:subset(8,1)
+      --end
+      --if (byteId == ByteArray.new("02")) then
+      --  return "id"
+      --end
+      --return "pos"
       --    if (bytes:subset(10,1) == ByteArray.new("02")) then
       --      return "id"
       --    elseif bytes:subset(10,1) == ByteArray.new("12") or
@@ -69,25 +70,11 @@ function detectType(buf, pkt)
   return "hello"
 end
 
-function getFieldsFromType(buf, pkt, root)
-  if (detectType(buf, pkt) == "hello") then
-    return getHelloFields()
-  elseif (detectType(buf, pkt) == "id") then
-    return getIdFields()
-  elseif (detectType(buf, pkt) == "pos") then
-    return getPosFields()
-  elseif (detectType(buf, pkt) == "sync-keep-alive") then
-    return getSyncKeepAliveFields()
-  elseif (detectType(buf, pkt) == "sync-session") then
-    return getSyncSessionFields()
-  elseif (detectType(buf, pkt) == "sync") then
-    return getSyncFields()
-  end
-end
-
 function setFieldsFromType(buf, pkt, root)
   if(detectType(buf, pkt) == "hello") then
     setHelloFields(buf,pkt,root)
+  elseif(detectType(buf, pkt) == "player") then
+    setPlayerFields(buf, pkt, root)
   elseif (detectType(buf, pkt) == "id") then
     setIdFields(buf,pkt,root)
   elseif (detectType(buf, pkt) == "pos") then
@@ -160,20 +147,21 @@ function setBeforeHandShakeField(buf, pkt, subtree)
   end
 end
 
-function setUnknownP2PEnum(buf, pkt, subtree)
-  local byteStart = 8 + getIniP2PBytePos(buf,pkt)
+function setUnknownP2PEnum(start, buf, pkt, subtree)
+  local byteStart = start + getIniP2PBytePos(buf,pkt)
   subtree:add(f_sb_unknown_enum, buf(byteStart,1))
 end
 
-function setSubPacketSize(buf, pkt, subtree)
-  local byteStart = 9 + getIniP2PBytePos(buf,pkt)
+function setSubPacketSize(start, buf, pkt, subtree)
+  local byteStart = start + getIniP2PBytePos(buf,pkt)
   subtree:add(f_sb_sub_pkt_size, buf(byteStart,1))
 end
 
-function setSubPacket(buf, pkt, subtree)
-  local byteStart = 9 + getIniP2PBytePos(buf,pkt)
+function setSubPacket(start, buf, pkt, subtree)
+  local byteStart = start + getIniP2PBytePos(buf,pkt)
   local pktSize = buf(byteStart,1):int()
   subtree:add(f_sb_sub_pkt, buf(byteStart+1,pktSize))
+  return pktSize
 end
 
 function setUnknownP2PSequence(buf, pkt, subtree, byteStart)

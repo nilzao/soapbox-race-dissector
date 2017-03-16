@@ -1,4 +1,5 @@
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-hello.lua")
+dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-player.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-id.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-pos.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-sync-keep-alive.lua")
