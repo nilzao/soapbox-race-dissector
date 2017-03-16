@@ -15,13 +15,15 @@ function setPlayerFields(buf, pkt, subtree)
   packetSize = setSubPacket(9, buf, pkt, subtree)
   packetSize = packetSize + 10
   unknownEnum = setUnknownP2PEnum(packetSize, buf, pkt, subtree)
+  local packetPos =0
   if(unknownEnum ~= -1) then
-    packetSize = packetSize + 1
-    setSubPacketSize(packetSize, buf, pkt, subtree)
-    packetSize = setSubPacket(packetSize, buf, pkt, subtree)
+    packetPos = packetSize + 1
+    setSubPacketSize(packetPos, buf, pkt, subtree)
+    packetSize = setSubPacket(packetPos, buf, pkt, subtree) + 1
+    unknownEnum = setUnknownP2PEnum(packetSize, buf, pkt, subtree)
   end
   setPacketField(buf,pkt,subtree)
 
   pkt.cols.protocol = 'SB-PLAYER'
-  pkt.cols.info = 'Player Protocol ['..cli_cli_type..']'
+  pkt.cols.info = 'Player Protocol ['..cli_cli_type..']'..packetPos
 end
