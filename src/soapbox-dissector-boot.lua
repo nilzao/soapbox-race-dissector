@@ -7,7 +7,8 @@ dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-sync-session.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-sync.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-packet-types.lua")
 
-p_soapbox = Proto ("SOAPBOX","Soapbox-race ")
+p_soapbox = Proto ("SB-RACE","Soapbox-race ")
+p_soapbox_freeroam = Proto ("SB-FREEROAM","Soapbox-freeroam ")
 
 f_sb_pkt_orig_type = ProtoField.uint16("soapbox.pktorig", "Pkg Orig", base.BOOLEAN)
 f_sb_count = ProtoField.uint16("soapbox.count", "Counter", base.DEC)
@@ -23,6 +24,7 @@ f_persona_name = ProtoField.string("soapbox.personaid", "Persona Name", base.UNI
 f_persona_id = ProtoField.uint16("soapbox.personaid", "Persona Id", base.HEX)
 f_sb_pkt_size = ProtoField.uint16("soapbox.pktsize", "Pkt Size", base.DEC)
 f_sb_pkt = ProtoField.bytes("soapbox.pkt", "Pkt")
+f_sb_pkt_end = ProtoField.uint16("soapbox.pktend", "Packet End", base.HEX)
 f_sb_sub_pkt_size = ProtoField.uint16("soapbox.subpktsize", "SubPkt Size", base.DEC)
 f_sb_sub_pkt = ProtoField.bytes("soapbox.subpkt", "SubPkt")
 
@@ -40,6 +42,7 @@ p_soapbox.fields = {--
   f_persona_name, --
   f_sb_pkt_size, --
   f_sb_pkt, --
+  f_sb_pkt_end, --
   f_sb_sub_pkt_size, --
   f_sb_sub_pkt, --
   f_sb_crc --
@@ -48,9 +51,12 @@ p_soapbox.fields = {--
 function p_soapbox.init()
 end
 
+function p_soapbox_freeroam.init()
+end
+
 function p_soapbox.dissector (buf, pkt, root)
   if buf:len() == 0 then return end
-  pkt.cols.protocol = "SOAPBOX"
+  pkt.cols.protocol = "SB-RACE"
   local subtree = root:add(p_soapbox, buf(0))
   subtree:add(f_sb_pkt_orig_type, buf(0,1)):append_text(" ["..detectCliSrvType(buf).."]")
   setFieldsFromType(buf, pkt, subtree)
@@ -60,6 +66,22 @@ function p_soapbox.dissector (buf, pkt, root)
   end
 end
 
+function p_soapbox_freeroam.dissector(buf, pkt, root)
+  if buf:len() == 0 then return end
+  pkt.cols.protocol = "SB-FREEROAM"
+  local subtree = root:add(p_soapbox, buf(0))
+  local cli_cli_type = detectDirection(pkt)
+  subtree:add(f_sb_count, buf(0,2))
+  subtree:add(f_sb_unknown_enum, buf(2,1))
+  if(cli_cli_type == 'cli->srv') and buf(2,1):bytes() == ByteArray.new("07") then
+    if buf:len() > 15 then
+      setSubPackets(16,buf,pkt,subtree)
+    end
+  end
+  subtree:add(f_sb_crc, buf(buf:len()-4,4))
+end
+
 local udp_dissector_table = DissectorTable.get("udp.port")
 dissector = udp_dissector_table:get_dissector(9998)
 udp_dissector_table:add(9998, p_soapbox)
+udp_dissector_table:add(9999, p_soapbox_freeroam)

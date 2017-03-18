@@ -6,13 +6,8 @@ function detectCliSrvType(buf)
 end
 
 function detectDirection(pkt)
-  -- bug, when cli-to-cli-srv counter reach 0027 or 0073 mark a false srv-to-cli
-  -- 0027 and 0073 are packet size, need to implement right detection
-  -- local bytes = buf(0):bytes():subset(2,2)
-  -- if (bytes == ByteArray.new("0027") or bytes == ByteArray.new("0073")) then
-
-  -- quickfix with static port 9998, not nice...
-  if pkt.dst_port == 9998 then
+  -- quickfix with static port 9998 and 9999, not nice...
+  if pkt.dst_port == 9998 or pkt.dst_port == 9999 then
     return "cli->srv"
   end
   return "srv->cli"
@@ -168,4 +163,20 @@ end
 function setUnknownP2PSequence(buf, pkt, subtree, byteStart)
   local byteStart = byteStart + getIniP2PBytePos(buf,pkt)
   subtree:add(f_sb_unknown_seq, buf(byteStart,2))
+end
+
+function setSubPackets(start, buf, pkt, subtree)
+  local position = start
+  subtree:add(f_sb_unknown_enum, buf(position,1))
+  position = position + 1
+  local pktSize = buf(position,1):int()
+  subtree:add(f_sb_sub_pkt_size, buf(position,1))
+  position = position + 1
+  subtree:add(f_sb_sub_pkt, buf(position,pktSize))
+  position = position + pktSize
+  if buf(position,1):int() ~= -1 then
+    setSubPackets(position, buf, pkt, subtree)
+  else
+    subtree:add(f_sb_pkt_end, buf(position,1))
+  end
 end
