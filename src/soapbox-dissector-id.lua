@@ -1,9 +1,7 @@
-function setIdFields(buf, pkt, subtree)
+function setIdFields(start, buf, pkt, subtree)
   local cli_cli_type = detectDirection(pkt)
-  if(cli_cli_type == 'srv->cli') then
-    subtree:add(f_persona_name, buf(11,32))
-  else
-    subtree:add(f_persona_name, buf(13,32))
-    subtree:add(f_persona_id, buf(45,4))
+  subtree:add(f_persona_name, buf(start + 3,32))
+  if(cli_cli_type == 'cli->srv') then
+    subtree:add(f_persona_id, buf(start +35,4))
   end
 end

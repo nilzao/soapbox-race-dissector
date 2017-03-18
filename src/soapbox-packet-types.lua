@@ -70,8 +70,6 @@ function setFieldsFromType(buf, pkt, root)
     setHelloFields(buf,pkt,root)
   elseif(detectType(buf, pkt) == "player") then
     setPlayerFields(buf, pkt, root)
-  elseif (detectType(buf, pkt) == "id") then
-    setIdFields(buf,pkt,root)
   elseif (detectType(buf, pkt) == "pos") then
     setPosFields(buf,pkt,root)
   elseif (detectType(buf, pkt) == "sync-keep-alive") then
@@ -185,11 +183,14 @@ end
 function setSubPacketDetails(start, buf, pkt, subtree)
   local unknownEnum = buf(start,1):bytes()
   if unknownEnum == ByteArray.new("00") then
-  --
+  -- freeroam channel
   elseif unknownEnum == ByteArray.new("01") then
-  --
+    -- freeroam player id
+    subtree:add(f_persona_name, buf(start + 3,32))
+    subtree:add(f_persona_id, buf(start + 43, 4))
   elseif unknownEnum == ByteArray.new("02") then
-    setIdFields(buf,pkt,subtree)
+    -- race player id
+    setIdFields(start, buf, pkt, subtree)
   elseif unknownEnum == ByteArray.new("10") then
   --
   elseif unknownEnum == ByteArray.new("11") then
