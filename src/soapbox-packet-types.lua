@@ -172,11 +172,29 @@ function setSubPackets(start, buf, pkt, subtree)
   local pktSize = buf(position,1):int()
   subtree:add(f_sb_sub_pkt_size, buf(position,1))
   position = position + 1
+  setSubPacketDetails(start, buf, pkt, subtree)
   subtree:add(f_sb_sub_pkt, buf(position,pktSize))
   position = position + pktSize
   if buf(position,1):int() ~= -1 then
     setSubPackets(position, buf, pkt, subtree)
   else
     subtree:add(f_sb_pkt_end, buf(position,1))
+  end
+end
+
+function setSubPacketDetails(start, buf, pkt, subtree)
+  local unknownEnum = buf(start,1):bytes()
+  if unknownEnum == ByteArray.new("00") then
+  --
+  elseif unknownEnum == ByteArray.new("01") then
+  --
+  elseif unknownEnum == ByteArray.new("02") then
+    setIdFields(buf,pkt,subtree)
+  elseif unknownEnum == ByteArray.new("10") then
+  --
+  elseif unknownEnum == ByteArray.new("11") then
+  --
+  elseif unknownEnum == ByteArray.new("12") then
+  --
   end
 end
