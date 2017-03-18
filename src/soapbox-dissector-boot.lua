@@ -72,7 +72,6 @@ function p_soapbox_freeroam.dissector(buf, pkt, root)
   local subtree = root:add(p_soapbox, buf(0))
   local cli_cli_type = detectDirection(pkt)
   subtree:add(f_sb_count, buf(0,2))
-  --  subtree:add(f_sb_unknown_enum, buf(2,1))
   if(cli_cli_type == 'cli->srv') and buf(2,1):bytes() == ByteArray.new("07") then
     setTimeField(buf, subtree, 4)
     if buf:len() > 15 then
@@ -80,6 +79,7 @@ function p_soapbox_freeroam.dissector(buf, pkt, root)
     end
   end
   subtree:add(f_sb_crc, buf(buf:len()-4,4))
+  pkt.cols.info = 'FreeRoam Protocol ['..cli_cli_type..']'
 end
 
 local udp_dissector_table = DissectorTable.get("udp.port")

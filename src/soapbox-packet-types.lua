@@ -41,22 +41,6 @@ function detectType(buf, pkt)
     return "sync"
   elseif (bytes:subset(0,1) == ByteArray.new("01") )then
     return "player"
-      --local cli_cli_type = detectDirection(pkt)
-      --local byteId = bytes:subset(10,1)
-      --if cli_cli_type == "srv->cli" then
-      --  byteId = bytes:subset(8,1)
-      --end
-      --if (byteId == ByteArray.new("02")) then
-      --  return "id"
-      --end
-      --return "pos"
-      --    if (bytes:subset(10,1) == ByteArray.new("02")) then
-      --      return "id"
-      --    elseif bytes:subset(10,1) == ByteArray.new("12") or
-      --      bytes:subset(10,1) == ByteArray.new("11") or
-      --      bytes:subset(10,1) == ByteArray.new("10") then
-      --      return "pos"
-      --    end
   elseif (bytes:len() == 12 or bytes:len() == 75) then
     if (bytes:subset(4,1) == ByteArray.new("06")) then
       return "hello"
@@ -70,8 +54,6 @@ function setFieldsFromType(buf, pkt, root)
     setHelloFields(buf,pkt,root)
   elseif(detectType(buf, pkt) == "player") then
     setPlayerFields(buf, pkt, root)
-  elseif (detectType(buf, pkt) == "pos") then
-    setPosFields(buf,pkt,root)
   elseif (detectType(buf, pkt) == "sync-keep-alive") then
     setSyncKeepAliveFields(buf,pkt,root)
   elseif (detectType(buf, pkt) == "sync-session") then
@@ -138,29 +120,6 @@ function setBeforeHandShakeField(buf, pkt, subtree)
   else
     subtree:add(f_sb_unknown_seq, buf(byteStart,2))
   end
-end
-
-function setUnknownP2PEnum(start, buf, pkt, subtree)
-  local byteStart = start + getIniP2PBytePos(buf,pkt)
-  subtree:add(f_sb_unknown_enum, buf(byteStart,1))
-  return buf(byteStart,1):int()
-end
-
-function setSubPacketSize(start, buf, pkt, subtree)
-  local byteStart = start + getIniP2PBytePos(buf,pkt)
-  subtree:add(f_sb_sub_pkt_size, buf(byteStart,1))
-end
-
-function setSubPacket(start, buf, pkt, subtree)
-  local byteStart = start + getIniP2PBytePos(buf,pkt)
-  local pktSize = buf(byteStart,1):int()
-  subtree:add(f_sb_sub_pkt, buf(byteStart+1,pktSize))
-  return pktSize
-end
-
-function setUnknownP2PSequence(buf, pkt, subtree, byteStart)
-  local byteStart = byteStart + getIniP2PBytePos(buf,pkt)
-  subtree:add(f_sb_unknown_seq, buf(byteStart,2))
 end
 
 function setSubPackets(start, buf, pkt, subtree)
