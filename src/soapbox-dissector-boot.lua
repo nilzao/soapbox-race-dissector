@@ -1,5 +1,6 @@
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-hello.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-player.lua")
+dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-statepos.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-id.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-pos.lua")
 dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-sync-keep-alive.lua")
@@ -17,6 +18,8 @@ f_sb_before_handshake = ProtoField.uint16("soapbox.beforehs", "Before HandShake"
 f_sb_unknown_seq = ProtoField.uint16("soapbox.unknownseq", "Uknown Seq", base.HEX)
 f_sb_unknown_enum = ProtoField.uint16("soapbox.unknownenum", "Uknown Enum", base.HEX)
 f_sb_static_ff = ProtoField.uint16("soapbox.staticff", "Static 0xFF", base.HEX)
+f_sb_static_02 = ProtoField.uint16("soapbox.static02", "Static 0x02", base.HEX)
+f_sb_hello_sync = ProtoField.uint16("soapbox.hellosync", "Hello Sync", base.HEX)
 f_sb_crc = ProtoField.uint16("soapbox.crc", "CRC", base.HEX)
 f_sb_player = ProtoField.uint16("soapbox.player", "Player", base.DEC)
 f_sb_session_id = ProtoField.uint16("soapbox.sessionid", "Session Id", base.DEC)
@@ -35,6 +38,8 @@ p_soapbox.fields = {--
   f_sb_unknown_enum, --
   f_sb_before_handshake, --
   f_sb_static_ff, --
+  f_sb_static_02, --
+  f_sb_hello_sync, --
   f_sb_pkt_orig_type, --
   f_sb_session_id, --
   f_sb_player, --
@@ -77,6 +82,12 @@ function p_soapbox_freeroam.dissector(buf, pkt, root)
     if buf:len() > 15 then
       setSubPackets(16,buf,pkt,subtree)
     end
+  elseif cli_cli_type == 'srv->cli' and buf:len() > 12 then
+    subtree:add(f_sb_static_02, buf(2,1))
+    setTimeField(buf, subtree, 3)
+    subtree:add(f_sb_hello_sync, buf(5,2))
+    subtree:add(f_sb_unknown_seq, buf(7,2))
+    setSubPackets(13,buf,pkt,subtree)
   end
   subtree:add(f_sb_crc, buf(buf:len()-4,4))
   pkt.cols.info = 'FreeRoam Protocol ['..cli_cli_type..']'

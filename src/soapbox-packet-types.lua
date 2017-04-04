@@ -134,6 +134,8 @@ function setSubPackets(start, buf, pkt, subtree)
   position = position + pktSize
   if buf(position,1):int() ~= -1 then
     setSubPackets(position, buf, pkt, subtree)
+  elseif buf(position+1,1):int() == 0 then
+    setSubPackets(position, buf, pkt, subtree)
   else
     subtree:add(f_sb_pkt_end, buf(position,1))
   end
@@ -155,6 +157,6 @@ function setSubPacketDetails(start, buf, pkt, subtree)
   elseif unknownEnum == ByteArray.new("11") then
   --
   elseif unknownEnum == ByteArray.new("12") then
-  --
+    setStatePosFields(start,buf,pkt,subtree)
   end
 end
