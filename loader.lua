@@ -14,4 +14,4 @@ _G['protbuf_dissector'] = {
 }
 
 package.prepend_path("modules")
-require "soapbox-dissector-boot"
+require "soapbox.boot"

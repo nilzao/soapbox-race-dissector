@@ -1,12 +1,12 @@
-require "soapbox-dissector-hello"
-require "soapbox-dissector-player"
-require "soapbox-dissector-statepos"
-require "soapbox-dissector-id"
-require "soapbox-dissector-pos"
-require "soapbox-dissector-sync-keep-alive"
-require "soapbox-dissector-sync-session"
-require "soapbox-dissector-sync"
-require "soapbox-packet-types"
+require "soapbox.dissector-hello"
+require "soapbox.dissector-player"
+require "soapbox.dissector-statepos"
+require "soapbox.dissector-id"
+require "soapbox.dissector-pos"
+require "soapbox.dissector-sync-keep-alive"
+require "soapbox.dissector-sync-session"
+require "soapbox.dissector-sync"
+require "soapbox.packet-types"
 
 p_soapbox = Proto ("SB-RACE","Soapbox-race ")
 p_soapbox_freeroam = Proto ("SB-FREEROAM","Soapbox-freeroam ")
