@@ -5,7 +5,13 @@ function script_path()
   return str:match("(.*/)")
 end
 
-SOAPBOX_DISSECTOR_PATH = script_path() .."src/modules/"
+__DIR__ = script_path() .."src"
 __DIR_SEPARATOR__ = package.path:match( "(%p)%?%." )
 
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-boot.lua")
+_G['protbuf_dissector'] = {
+  ["__DIR__"] = __DIR__,
+  ["__DIR_SEPARATOR__"] = __DIR_SEPARATOR__,
+}
+
+package.prepend_path("modules")
+require "soapbox-dissector-boot"

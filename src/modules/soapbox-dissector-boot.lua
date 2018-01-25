@@ -1,12 +1,12 @@
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-hello.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-player.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-statepos.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-id.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-pos.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-sync-keep-alive.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-sync-session.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-dissector-sync.lua")
-dofile(SOAPBOX_DISSECTOR_PATH.."soapbox-packet-types.lua")
+require "soapbox-dissector-hello"
+require "soapbox-dissector-player"
+require "soapbox-dissector-statepos"
+require "soapbox-dissector-id"
+require "soapbox-dissector-pos"
+require "soapbox-dissector-sync-keep-alive"
+require "soapbox-dissector-sync-session"
+require "soapbox-dissector-sync"
+require "soapbox-packet-types"
 
 p_soapbox = Proto ("SB-RACE","Soapbox-race ")
 p_soapbox_freeroam = Proto ("SB-FREEROAM","Soapbox-freeroam ")
