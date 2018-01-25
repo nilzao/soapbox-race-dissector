@@ -13,8 +13,13 @@ p_soapbox_freeroam = Proto ("SB-FREEROAM","Soapbox-freeroam ")
 
 f_sb_pkt_orig_type = ProtoField.uint16("soapbox.pktorig", "Pkg Orig", base.BOOLEAN)
 f_sb_count = ProtoField.uint16("soapbox.count", "Counter", base.DEC)
+f_sb_srv_pkt_type = ProtoField.uint16("soapbox.srvtype", "Srv Pkt Type", base.HEX)
 f_sb_time = ProtoField.uint16("soapbox.time", "Time", base.DEC)
+f_sb_fr_cli_hello_time = ProtoField.uint16("soapbox.clihellotime", "Time", base.HEX)
+f_sb_fr_frag_count = ProtoField.uint16("soapbox.fragcount", "Fragmented counter", base.DEC)
 f_sb_before_handshake = ProtoField.uint16("soapbox.beforehs", "Before HandShake", base.HEX)
+f_sb_unknown = ProtoField.uint16("soapbox.unknown", "Uknown", base.HEX)
+f_sb_fr_slot = ProtoField.bytes("soapbox.frslot", "Freeroam Slot")
 f_sb_unknown_seq = ProtoField.uint16("soapbox.unknownseq", "Uknown Seq", base.HEX)
 f_sb_unknown_enum = ProtoField.uint16("soapbox.unknownenum", "Uknown Enum", base.HEX)
 f_sb_static_ff = ProtoField.uint16("soapbox.staticff", "Static 0xFF", base.HEX)
@@ -33,7 +38,12 @@ f_sb_sub_pkt = ProtoField.bytes("soapbox.subpkt", "SubPkt")
 
 p_soapbox.fields = {--
   f_sb_count, --
+  f_sb_srv_pkt_type, --
   f_sb_time, --
+  f_sb_fr_cli_hello_time, --
+  f_sb_fr_frag_count, --
+  f_sb_unknown, --
+  f_sb_fr_slot, --
   f_sb_unknown_seq, --
   f_sb_unknown_enum, --
   f_sb_before_handshake, --
@@ -59,18 +69,6 @@ end
 function p_soapbox_freeroam.init()
 end
 
-function p_soapbox.dissector (buf, pkt, root)
-  if buf:len() == 0 then return end
-  pkt.cols.protocol = "SB-RACE"
-  local subtree = root:add(p_soapbox, buf(0))
-  subtree:add(f_sb_pkt_orig_type, buf(0,1)):append_text(" ["..detectCliSrvType(buf).."]")
-  setFieldsFromType(buf, pkt, subtree)
-  local cli_cli_type = detectDirection(pkt)
-  if(cli_cli_type == 'srv->cli') then
-    subtree:add(f_sb_crc, buf(buf:len()-4,4))
-  end
-end
-
 function p_soapbox_freeroam.dissector(buf, pkt, root)
   if buf:len() == 0 then return end
   pkt.cols.protocol = "SB-FREEROAM"
@@ -94,6 +92,4 @@ function p_soapbox_freeroam.dissector(buf, pkt, root)
 end
 
 local udp_dissector_table = DissectorTable.get("udp.port")
-dissector = udp_dissector_table:get_dissector(9998)
-udp_dissector_table:add(9998, p_soapbox)
 udp_dissector_table:add(9999, p_soapbox_freeroam)
