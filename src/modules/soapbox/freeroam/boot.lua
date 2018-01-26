@@ -35,6 +35,8 @@ f_sb_pkt = ProtoField.bytes("soapbox.pkt", "Pkt")
 f_sb_pkt_end = ProtoField.uint16("soapbox.pktend", "Packet End", base.HEX)
 f_sb_sub_pkt_size = ProtoField.uint16("soapbox.subpktsize", "SubPkt Size", base.DEC)
 f_sb_sub_pkt = ProtoField.bytes("soapbox.subpkt", "SubPkt")
+f_sb_crypto_ticket = ProtoField.bytes("soapbox.cryptotkt", "Crypto Ticket", base.HEX)
+f_sb_ticket_iv = ProtoField.bytes("soapbox.ticketiv", "Ticket IV", base.HEX)
 
 p_soapbox.fields = {--
   f_sb_count, --
@@ -60,7 +62,9 @@ p_soapbox.fields = {--
   f_sb_pkt_end, --
   f_sb_sub_pkt_size, --
   f_sb_sub_pkt, --
-  f_sb_crc --
+  f_sb_crc, --
+  f_sb_crypto_ticket, --
+  f_sb_ticket_iv --
 }
 
 function p_soapbox.init()
@@ -75,9 +79,22 @@ function p_soapbox_freeroam.dissector(buf, pkt, root)
   local subtree = root:add(p_soapbox, buf(0))
   local cli_cli_type = detectDirection(pkt)
   subtree:add(f_sb_count, buf(0,2))
-  subtree:add(f_sb_srv_pkt_type, buf(2,1))
+  subtree:add(f_sb_srv_pkt_type, buf(2, 1))
   if(cli_cli_type == 'cli->srv') then
-  --
+    if buf(2,1):bytes() == ByteArray.new("06") then
+      subtree:add(f_sb_crypto_ticket, buf(3, 32))
+      subtree:add(f_sb_ticket_iv, buf(35, 16))
+      setUnknown(buf, subtree, 51, 1)
+      setCliHelloTime(buf, subtree, 52)
+    elseif buf(2,1):bytes() == ByteArray.new("07") then
+      subtree:add(f_sb_srv_pkt_type, buf(3, 1))
+      setTimeField(buf, subtree, 4)
+      subtree:add(f_sb_unknown_seq, buf(6, 2))
+      subtree:add(f_sb_count, buf(8, 2))
+      setUnknown(buf, subtree, 10, 6)
+      setSubPackets(16, buf, pkt, subtree)
+      subtree:add(f_sb_pkt_end, buf(buf:len()-5,1))
+    end
   else
     setTimeField(buf, subtree, 3)
     setCliHelloTime(buf, subtree, 5)
