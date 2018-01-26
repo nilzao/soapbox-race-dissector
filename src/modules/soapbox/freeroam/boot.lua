@@ -13,12 +13,12 @@ p_soapbox_freeroam = Proto ("SB-FREEROAM","Soapbox-freeroam ")
 
 f_sb_pkt_orig_type = ProtoField.uint16("soapbox.pktorig", "Pkg Orig", base.BOOLEAN)
 f_sb_count = ProtoField.uint16("soapbox.count", "Counter", base.DEC)
-f_sb_srv_pkt_type = ProtoField.uint16("soapbox.srvtype", "Srv Pkt Type", base.HEX)
+f_sb_srv_pkt_type = ProtoField.bytes("soapbox.srvtype", "Srv Pkt Type", base.HEX)
 f_sb_time = ProtoField.uint16("soapbox.time", "Time", base.DEC)
-f_sb_fr_cli_hello_time = ProtoField.uint16("soapbox.clihellotime", "Time", base.HEX)
+f_sb_fr_cli_hello_time = ProtoField.uint16("soapbox.clihellotime", "Cli Hello Time", base.DEC)
 f_sb_fr_frag_count = ProtoField.uint16("soapbox.fragcount", "Fragmented counter", base.DEC)
 f_sb_before_handshake = ProtoField.uint16("soapbox.beforehs", "Before HandShake", base.HEX)
-f_sb_unknown = ProtoField.uint16("soapbox.unknown", "Uknown", base.HEX)
+f_sb_unknown = ProtoField.bytes("soapbox.unknown", "Uknown", base.HEX)
 f_sb_fr_slot = ProtoField.bytes("soapbox.frslot", "Freeroam Slot")
 f_sb_unknown_seq = ProtoField.uint16("soapbox.unknownseq", "Uknown Seq", base.HEX)
 f_sb_unknown_enum = ProtoField.uint16("soapbox.unknownenum", "Uknown Enum", base.HEX)
@@ -75,18 +75,30 @@ function p_soapbox_freeroam.dissector(buf, pkt, root)
   local subtree = root:add(p_soapbox, buf(0))
   local cli_cli_type = detectDirection(pkt)
   subtree:add(f_sb_count, buf(0,2))
-  if(cli_cli_type == 'cli->srv') and buf(2,1):bytes() == ByteArray.new("07") then
-    setTimeField(buf, subtree, 4)
-    if buf:len() > 15 then
-      setSubPackets(16,buf,pkt,subtree)
+  subtree:add(f_sb_srv_pkt_type, buf(2,1))
+  if(cli_cli_type == 'cli->srv') then
+  --
+  else
+    if buf(2,1):bytes() == ByteArray.new("02") then
+      setTimeField(buf, subtree, 3)
+      setCliHelloTime(buf, subtree, 5)
+      setFragCount(buf, subtree, 7)
+      setUnknown(buf, subtree, 9, 3)
+      setFreeroamSlots(buf, subtree, 12, pkt);
     end
-  elseif cli_cli_type == 'srv->cli' and buf:len() > 12 then
-    subtree:add(f_sb_static_02, buf(2,1))
-    setTimeField(buf, subtree, 3)
-    subtree:add(f_sb_hello_sync, buf(5,2))
-    subtree:add(f_sb_unknown_seq, buf(7,2))
-    setSubPackets(13,buf,pkt,subtree)
   end
+  --  if(cli_cli_type == 'cli->srv') and buf(2,1):bytes() == ByteArray.new("07") then
+  --    setTimeField(buf, subtree, 4)
+  --    if buf:len() > 15 then
+  --      setSubPackets(16,buf,pkt,subtree)
+  --    end
+  --  elseif cli_cli_type == 'srv->cli' and buf:len() > 12 then
+  --    subtree:add(f_sb_static_02, buf(2,1))
+  --    setTimeField(buf, subtree, 3)
+  --    subtree:add(f_sb_hello_sync, buf(5,2))
+  --    subtree:add(f_sb_unknown_seq, buf(7,2))
+  --    setSubPackets(13,buf,pkt,subtree)
+  --  end
   subtree:add(f_sb_crc, buf(buf:len()-4,4))
   pkt.cols.info = 'FreeRoam Protocol ['..cli_cli_type..']'
 end

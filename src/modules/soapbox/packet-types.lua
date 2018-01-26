@@ -85,6 +85,20 @@ function setTimeField(buf, subtree, pos_ini)
   subtree:add(f_sb_time, buf(pos_ini,2))
 end
 
+function setCliHelloTime(buf, subtree, pos_ini)
+  subtree:add(f_sb_fr_cli_hello_time, buf(pos_ini,2))
+end
+
+function setFragCount(buf, subtree, pos_ini)
+  subtree:add(f_sb_fr_frag_count, buf(pos_ini,2))
+end
+
+function setUnknown(buf, subtree, pos_ini,size)
+  subtree:add(f_sb_unknown, buf(pos_ini,size))
+end
+
+
+
 function setPlayerField(buf, subtree)
   subtree:add(f_sb_player, buf(1,1))
 end
@@ -129,14 +143,13 @@ function setSubPackets(start, buf, pkt, subtree)
   local pktSize = buf(position,1):int()
   subtree:add(f_sb_sub_pkt_size, buf(position,1))
   position = position + 1
-  setSubPacketDetails(start, buf, pkt, subtree)
-  subtree:add(f_sb_sub_pkt, buf(position,pktSize))
+  local subPacketTree = subtree:add( f_sb_sub_pkt, buf(position,pktSize) )
+  --  subtree:add(f_sb_sub_pkt, buf(position,pktSize))
+  setSubPacketDetails(start, buf, pkt, subPacketTree)
   position = position + pktSize
   if buf(position,1):int() ~= -1 then
     setSubPackets(position, buf, pkt, subtree)
   elseif buf(position+1,1):int() == 0 then
-    setSubPackets(position, buf, pkt, subtree)
-  else
     subtree:add(f_sb_pkt_end, buf(position,1))
   end
 end
@@ -160,3 +173,54 @@ function setSubPacketDetails(start, buf, pkt, subtree)
     setStatePosFields(start,buf,pkt,subtree)
   end
 end
+
+function getSubPacketSizeOnce(start, buf)
+  if buf:len() < (start + 1) then
+    return 0
+  end
+  local pktSize = buf(start + 1,1):int()
+  if(pktSize <= 0) then
+    return 0
+  end
+  return pktSize +2
+end
+
+function getSubPacketSize(start, buf)
+  local pktSize = getSubPacketSizeOnce(start, buf)
+  local position = 0
+
+  position = start + pktSize
+  pktSize = pktSize + getSubPacketSizeOnce(position, buf)
+
+  position = start + pktSize
+  pktSize = pktSize + getSubPacketSizeOnce(position, buf)
+
+  return pktSize +2
+end
+
+function setFreeroamSlots(buf, subtree, pos_ini, pkt)
+  local slotsEnd = buf:len()-4
+  local i = pos_ini
+  local size = 2
+  while i < slotsEnd  do
+    if(buf(i,1):int() == -1) then
+      size = i - pos_ini + 1
+      if ((buf(pos_ini,1):int() == -1) or (buf(pos_ini,1):int() == 0)) then
+        if (buf(pos_ini+1,1):int() == -1) then
+          local freeroamSlotTree = subtree:add( f_sb_fr_slot, buf(pos_ini, size) )
+        elseif (buf(pos_ini,1):int() == 0) then
+          size = getSubPacketSize(pos_ini+1, buf)
+          if(buf():len() < pos_ini + size)then
+            size = buf():len() - pos_ini - 4
+          end
+          local freeroamSlotTree = subtree:add( f_sb_fr_slot, buf(pos_ini, size) )
+          setSubPackets(pos_ini+1, buf, pkt, freeroamSlotTree)
+        end
+      end
+      pos_ini = i+1
+      i= i+1
+    end
+    i= i+1
+  end
+end
+
