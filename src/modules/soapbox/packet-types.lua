@@ -157,10 +157,11 @@ end
 function setSubPacketDetails(start, buf, pkt, subtree)
   local unknownEnum = buf(start,1):bytes()
   if unknownEnum == ByteArray.new("00") then
-  -- freeroam channel
+    -- freeroam channel
+    subtree:add(f_sb_chan_info, buf(start + 4, 13))
   elseif unknownEnum == ByteArray.new("01") then
     -- freeroam player id
-    subtree:add(f_persona_name, buf(start + 3,32))
+    subtree:add(f_persona_name, buf(start + 3, 32))
     subtree:add(f_persona_id, buf(start + 43, 4))
   elseif unknownEnum == ByteArray.new("02") then
     -- race player id
