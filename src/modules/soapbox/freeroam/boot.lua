@@ -79,9 +79,9 @@ function p_soapbox_freeroam.dissector(buf, pkt, root)
   if(cli_cli_type == 'cli->srv') then
   --
   else
+    setTimeField(buf, subtree, 3)
+    setCliHelloTime(buf, subtree, 5)
     if buf(2,1):bytes() == ByteArray.new("02") then
-      setTimeField(buf, subtree, 3)
-      setCliHelloTime(buf, subtree, 5)
       setFragCount(buf, subtree, 7)
       setUnknown(buf, subtree, 9, 3)
       setFreeroamSlots(buf, subtree, 12, pkt);
