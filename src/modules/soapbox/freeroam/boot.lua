@@ -38,6 +38,7 @@ f_sb_sub_pkt = ProtoField.bytes("soapbox.subpkt", "SubPkt")
 f_sb_crypto_ticket = ProtoField.bytes("soapbox.cryptotkt", "Crypto Ticket", base.HEX)
 f_sb_ticket_iv = ProtoField.bytes("soapbox.ticketiv", "Ticket IV", base.HEX)
 f_sb_chan_info = ProtoField.string("soapbox.channel", "Channel", base.UNIT_STRING)
+f_sb_flying = ProtoField.bool("soapbox.notflying", "fly bit", 16,{"ground","flying"},8)
 
 p_soapbox.fields = {--
   f_sb_count, --
@@ -66,7 +67,8 @@ p_soapbox.fields = {--
   f_sb_crc, --
   f_sb_crypto_ticket, --
   f_sb_ticket_iv, --
-  f_sb_chan_info --
+  f_sb_chan_info, --
+  f_sb_flying
 }
 
 function p_soapbox.init()

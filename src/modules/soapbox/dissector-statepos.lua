@@ -1,6 +1,8 @@
 function setStatePosFields(start, buf, pkt, subtree)
-  --local cli_cli_type = detectDirection(pkt)
-  --if(cli_cli_type == 'cli->srv') then
-    setTimeField(buf, subtree, start + 2)
-  --end
+  setTimeField(buf, subtree, start + 2)
+  subtree:add(f_sb_flying, buf(start + 4, 1))
+  local notflying = buf:range(start + 4, 1):bitfield(4)
+  if(notflying == 1) then
+  --parse yzx
+  end
 end
