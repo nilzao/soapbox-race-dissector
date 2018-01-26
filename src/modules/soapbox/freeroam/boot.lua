@@ -41,9 +41,9 @@ f_sb_chan_info = ProtoField.string("soapbox.channel", "Channel", base.UNIT_STRIN
 f_sb_flying = ProtoField.bool("soapbox.notflying", "fly bit", 16,{"ground","flying"},8)
 f_sb_y = ProtoField.uint32("soapbox.cary", "car Y", base.DEC, null, 524284)
 f_sb_z = ProtoField.uint32("soapbox.carz", "car Z", base.DEC, null, 262080)
-f_sb_z2 = ProtoField.uint32("soapbox.carz", "car Z2", base.DEC, null, 131040)
+f_sb_z2 = ProtoField.uint32("soapbox.carz", "car Z+", base.DEC, null, 131040)
 f_sb_x = ProtoField.uint32("soapbox.carx", "car X", base.DEC, null, 4194288)
-f_sb_x2 = ProtoField.uint32("soapbox.carx", "car X2", base.DEC, null, 2097144)
+f_sb_x2 = ProtoField.uint32("soapbox.carx", "car X+", base.DEC, null, 2097144)
 
 p_soapbox.fields = {--
   f_sb_count, --
