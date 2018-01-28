@@ -31,18 +31,20 @@ function p_soapbox_race.dissector (buf, pkt, root)
         setUnknown(buf, subtree, 68, 1)
         setCliHelloTime(buf, subtree, 69)
       elseif (buf(3, 1):int() == 7) then
+        subtree:add(f_sb_srv_pkt_type, buf(4, 1))
         setTimeField(buf,subtree, 5)
+        subtree:add(f_sb_count_5sec, buf(7,2))
         if(buf():len() == 26) then
           pkt.cols.protocol = "SB-SYNC-START"
-          setUnknown(buf, subtree, 7, 9)
+          setUnknown(buf, subtree, 9, 7)
           subtree:add(f_sb_session_id, buf(16,4))
           setUnknown(buf, subtree, 20, 2)
         elseif(buf():len() == 22) then
           pkt.cols.protocol = "SB-SYNC"
-          setUnknown(buf, subtree, 7, 11)
+          setUnknown(buf, subtree, 9, 9)
         elseif(buf():len() == 18) then
           pkt.cols.protocol = "SB-KEEP-ALIVE"
-          setUnknown(buf, subtree, 7, 7)
+          setUnknown(buf, subtree, 9, 5)
         end
       end
       subtree:add(f_sb_crc, buf(buf:len()-4,4))
@@ -62,17 +64,18 @@ function p_soapbox_race.dissector (buf, pkt, root)
       if(buf(3,1):int() == 1) then
         pkt.cols.protocol = "SB-HELLO"
       elseif (buf(3,1):int() == 2) then
+        subtree:add(f_sb_count_5sec, buf(6,2))
         if(buf():len() == 25) then
           pkt.cols.protocol = "SB-SYNC-START"
-          setUnknown(buf, subtree, 6, 9)
+          setUnknown(buf, subtree, 8, 7)
           subtree:add(f_sb_session_id, buf(15,4))
           setUnknown(buf, subtree, 19, 2)
         elseif(buf():len() == 21) then
           pkt.cols.protocol = "SB-SYNC"
-          setUnknown(buf, subtree, 6, 11)
+          setUnknown(buf, subtree, 8, 9)
         elseif(buf():len() == 17) then
           pkt.cols.protocol = "SB-KEEP-ALIVE"
-          setUnknown(buf, subtree, 6, 7)
+          setUnknown(buf, subtree, 8, 5)
         end
       end
     elseif (buf(0, 1):int() == 1) then
