@@ -64,7 +64,9 @@ function p_soapbox_race.dissector (buf, pkt, root)
       elseif (buf(3,1):int() == 2) then
         if(buf():len() == 25) then
           pkt.cols.protocol = "SB-SYNC-START"
-          setUnknown(buf, subtree, 6, 15)
+          setUnknown(buf, subtree, 6, 9)
+          subtree:add(f_sb_session_id, buf(15,4))
+          setUnknown(buf, subtree, 19, 2)
         elseif(buf():len() == 21) then
           pkt.cols.protocol = "SB-SYNC"
           setUnknown(buf, subtree, 6, 11)
