@@ -144,7 +144,6 @@ function setSubPackets(start, buf, pkt, subtree)
   subtree:add(f_sb_sub_pkt_size, buf(position,1))
   position = position + 1
   local subPacketTree = subtree:add( f_sb_sub_pkt, buf(position,pktSize) )
-  --  subtree:add(f_sb_sub_pkt, buf(position,pktSize))
   setSubPacketDetails(start, buf, pkt, subPacketTree)
   position = position + pktSize
   if buf(position,1):int() ~= -1 then

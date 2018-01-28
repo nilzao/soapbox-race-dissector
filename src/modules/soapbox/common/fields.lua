@@ -73,7 +73,7 @@ p_soapbox.fields = {--
   f_sb_x2, --
   f_sb_mp_pkt_owner, --
   f_sb_unkown_count, --
-  f_sb_count_5sec
+  f_sb_count_5sec --
 }
 
 function p_soapbox.init()
