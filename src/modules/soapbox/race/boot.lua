@@ -74,15 +74,22 @@ function p_soapbox_race.dissector (buf, pkt, root)
         subtree:add(f_sb_count_5sec, buf(6,2))
         if(buf():len() == 25) then
           pkt.cols.protocol = "SB-SYNC-START"
-          setUnknown(buf, subtree, 8, 7)
+          setUnknown(buf, subtree, 8, 3)
+          subtree:add(f_sb_static_ff, buf(11,1))
+          setUnknown(buf, subtree, 12, 3)
           subtree:add(f_sb_session_id, buf(15,4))
-          setUnknown(buf, subtree, 19, 2)
+          setUnknown(buf, subtree, 19, 1)
+          subtree:add(f_sb_static_ff, buf(20,1))
         elseif(buf():len() == 21) then
           pkt.cols.protocol = "SB-SYNC"
-          setUnknown(buf, subtree, 8, 9)
+          setUnknown(buf, subtree, 8, 3)
+          subtree:add(f_sb_static_ff, buf(11,1))
+          setUnknown(buf, subtree, 12, 4)
+          subtree:add(f_sb_static_ff, buf(16,1))
         elseif(buf():len() == 17) then
           pkt.cols.protocol = "SB-KEEP-ALIVE"
-          setUnknown(buf, subtree, 8, 5)
+          setUnknown(buf, subtree, 8, 3)
+          subtree:add(f_sb_static_ff, buf(11,2))
         end
       end
     elseif (buf(0, 1):int() == 1) then
