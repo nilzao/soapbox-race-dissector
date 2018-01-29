@@ -33,7 +33,7 @@ function p_soapbox_race.dissector (buf, pkt, root)
       elseif (buf(3, 1):int() == 7) then
         subtree:add(f_sb_srv_pkt_type, buf(4, 1))
         setTimeField(buf,subtree, 5)
-        subtree:add(f_sb_count_5sec, buf(7,2))
+        subtree:add(f_sb_fr_cli_hello_time, buf(7,2))
         subtree:add(f_sb_unkown_count, buf(9,2))
         if(buf():len() == 26) then
           pkt.cols.protocol = "SB-SYNC-START"
@@ -73,10 +73,10 @@ function p_soapbox_race.dissector (buf, pkt, root)
       subtree:add(f_sb_count, buf(1,2))
       subtree:add(f_sb_srv_pkt_type, buf(3, 1))
       setTimeField(buf,subtree, 4)
+      subtree:add(f_sb_fr_cli_hello_time, buf(6,2))
       if(buf(3,1):int() == 1) then
         pkt.cols.protocol = "SB-HELLO"
       elseif (buf(3,1):int() == 2) then
-        subtree:add(f_sb_count_5sec, buf(6,2))
         subtree:add(f_sb_unkown_count, buf(8,2))
         if(buf():len() == 25) then
           pkt.cols.protocol = "SB-SYNC-START"
