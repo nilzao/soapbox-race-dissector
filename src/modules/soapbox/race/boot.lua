@@ -82,7 +82,7 @@ function p_soapbox_race.dissector (buf, pkt, root)
           pkt.cols.protocol = "SB-SYNC-START"
           setUnknown(buf, subtree, 10, 2)
           local subPacketTree = subtree:add(f_sb_sub_pkt, buf(12,9) )
-          subPacketTree:add(f_sb_unknown_enum, buf(12,1))
+          subPacketTree:add(f_sb_player, buf(12,1))
           subPacketTree:add(f_sb_pkt_size, buf(13,1))
           setUnknown(buf, subPacketTree, 14, 1)
           subPacketTree:add(f_sb_session_id, buf(15,4))
