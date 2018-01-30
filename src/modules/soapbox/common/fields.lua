@@ -35,6 +35,7 @@ f_sb_x = ProtoField.uint32("soapbox.carx", "car X ", base.DEC, null, 4194288)
 f_sb_x2 = ProtoField.uint32("soapbox.carx", "car X+", base.DEC, null, 2097144)
 f_sb_mp_pkt_owner = ProtoField.bytes("soapbox.mpowner", "Mp Pkt Type")
 f_sb_unkown_count = ProtoField.uint16("soapbox.unknowncount", "Unkown Counter", base.DEC)
+f_sb_handshake_sync = ProtoField.uint16("soapbox.hssync", "Handshake Sync", base.DEC, null, 65535)
 
 p_soapbox.fields = {--
   f_sb_count, --
@@ -71,7 +72,8 @@ p_soapbox.fields = {--
   f_sb_x, --
   f_sb_x2, --
   f_sb_mp_pkt_owner, --
-  f_sb_unkown_count --
+  f_sb_unkown_count, --
+  f_sb_handshake_sync --
 }
 
 function p_soapbox.init()

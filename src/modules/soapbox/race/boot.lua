@@ -35,9 +35,9 @@ function p_soapbox_race.dissector (buf, pkt, root)
         setTimeField(buf,subtree, 5)
         subtree:add(f_sb_fr_cli_hello_time, buf(7,2))
         subtree:add(f_sb_unkown_count, buf(9,2))
+        subtree:add(f_sb_handshake_sync, buf(11,2))
         if(buf():len() == 26) then
           pkt.cols.protocol = "SB-SYNC-START"
-          setUnknown(buf, subtree, 11, 2)
           local subPacketTree = subtree:add(f_sb_sub_pkt, buf(13,9) )
           subPacketTree:add(f_sb_unknown_enum, buf(13,1))
           subPacketTree:add(f_sb_pkt_size, buf(14,1))
@@ -47,15 +47,12 @@ function p_soapbox_race.dissector (buf, pkt, root)
           subPacketTree:add(f_sb_pkt_end, buf(21,1))
         elseif(buf():len() == 22) then
           pkt.cols.protocol = "SB-SYNC"
-          setUnknown(buf, subtree, 11, 2)
           local subPacketTree = subtree:add(f_sb_sub_pkt, buf(13,5) )
           subPacketTree:add(f_sb_unknown_enum, buf(13,1))
           subPacketTree:add(f_sb_pkt_size, buf(14,1))
-          setUnknown(buf, subPacketTree, 15, 2)
           subPacketTree:add(f_sb_pkt_end, buf(17,1))
         elseif(buf():len() == 18) then
           pkt.cols.protocol = "SB-KEEP-ALIVE"
-          setUnknown(buf, subtree, 11, 2)
           subtree:add(f_sb_pkt_end, buf(13,1))
         end
       end
@@ -78,9 +75,9 @@ function p_soapbox_race.dissector (buf, pkt, root)
         pkt.cols.protocol = "SB-HELLO"
       elseif (buf(3,1):int() == 2) then
         subtree:add(f_sb_unkown_count, buf(8,2))
+          subtree:add(f_sb_handshake_sync, buf(10,2))
         if(buf():len() == 25) then
           pkt.cols.protocol = "SB-SYNC-START"
-          setUnknown(buf, subtree, 10, 2)
           local subPacketTree = subtree:add(f_sb_sub_pkt, buf(12,9) )
           subPacketTree:add(f_sb_player, buf(12,1))
           subPacketTree:add(f_sb_pkt_size, buf(13,1))
@@ -90,7 +87,6 @@ function p_soapbox_race.dissector (buf, pkt, root)
           subPacketTree:add(f_sb_pkt_end, buf(20,1))
         elseif(buf():len() == 21) then
           pkt.cols.protocol = "SB-SYNC-WRONG"
-          setUnknown(buf, subtree, 10, 2)
           local subPacketTree = subtree:add(f_sb_sub_pkt, buf(12,5) )
           subPacketTree:add(f_sb_unknown_enum, buf(12,1))
           subPacketTree:add(f_sb_pkt_size, buf(13,1))
@@ -98,7 +94,6 @@ function p_soapbox_race.dissector (buf, pkt, root)
           subPacketTree:add(f_sb_pkt_end, buf(16,1))
         elseif(buf():len() == 22) then
           pkt.cols.protocol = "SB-SYNC"
-          setUnknown(buf, subtree, 10, 2)
           local subPacketTree = subtree:add(f_sb_sub_pkt, buf(12,6) )
           subPacketTree:add(f_sb_unknown_enum, buf(12,1))
           subPacketTree:add(f_sb_pkt_size, buf(13,1))
@@ -106,7 +101,6 @@ function p_soapbox_race.dissector (buf, pkt, root)
           subPacketTree:add(f_sb_pkt_end, buf(17,1))
         elseif(buf():len() == 17) then
           pkt.cols.protocol = "SB-KEEP-ALIVE"
-          setUnknown(buf, subtree, 10, 2)
           subtree:add(f_sb_pkt_end, buf(12,1))
         end
       end
