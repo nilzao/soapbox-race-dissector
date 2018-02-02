@@ -36,6 +36,10 @@ f_sb_x2 = ProtoField.uint32("soapbox.carx", "car X+", base.DEC, null, 2097144)
 f_sb_mp_pkt_owner = ProtoField.bytes("soapbox.mpowner", "Mp Pkt Type")
 f_sb_unkown_count = ProtoField.uint16("soapbox.unknowncount", "Unkown Counter", base.DEC)
 f_sb_handshake_sync = ProtoField.uint16("soapbox.hssync", "Handshake Sync", base.DEC, null, 65535)
+f_sb_player_slot = ProtoField.uint8("soapbox.playerslot", "Player Slot", base.DEC, null, 224)
+f_sb_max_players = ProtoField.uint8("soapbox.maxplayers", "Max Players", base.DEC, null, 14)
+f_sb_sync_slots = ProtoField.uint8("soapbox.syncslots", "Sync Slots bits", base.DEC, null, 255)
+f_sb_grid_idx = ProtoField.uint16("soapbox.grid_idx", "Grid idx", base.DEC)
 
 p_soapbox.fields = {--
   f_sb_count, --
@@ -73,7 +77,11 @@ p_soapbox.fields = {--
   f_sb_x2, --
   f_sb_mp_pkt_owner, --
   f_sb_unkown_count, --
-  f_sb_handshake_sync --
+  f_sb_handshake_sync, --
+  f_sb_player_slot, --
+  f_sb_max_players, --
+  f_sb_grid_idx, --
+  f_sb_sync_slots --
 }
 
 function p_soapbox.init()

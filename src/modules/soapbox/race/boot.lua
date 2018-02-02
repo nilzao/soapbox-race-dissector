@@ -43,7 +43,8 @@ function p_soapbox_race.dissector (buf, pkt, root)
           subPacketTree:add(f_sb_pkt_size, buf(14,1))
           setUnknown(buf, subPacketTree, 15, 1)
           subPacketTree:add(f_sb_session_id, buf(16,4))
-          setUnknown(buf, subPacketTree, 20, 1)
+          subPacketTree:add(f_sb_player_slot, buf(20,1))
+          subPacketTree:add(f_sb_max_players, buf(20,1))
           subPacketTree:add(f_sb_pkt_end, buf(21,1))
         elseif(buf():len() == 22) then
           pkt.cols.protocol = "SB-SYNC"
@@ -81,9 +82,9 @@ function p_soapbox_race.dissector (buf, pkt, root)
           local subPacketTree = subtree:add(f_sb_sub_pkt, buf(12,9) )
           subPacketTree:add(f_sb_unknown_enum, buf(12,1))
           subPacketTree:add(f_sb_pkt_size, buf(13,1))
-          subPacketTree:add(f_sb_player, buf(14,1))
+          subPacketTree:add(f_sb_grid_idx, buf(14,1))
           subPacketTree:add(f_sb_session_id, buf(15,4))
-          setUnknown(buf, subPacketTree, 19, 1)
+          subPacketTree:add(f_sb_sync_slots, buf(19,1))
           subPacketTree:add(f_sb_pkt_end, buf(20,1))
         elseif(buf():len() == 21) then
           pkt.cols.protocol = "SB-SYNC-WRONG"
